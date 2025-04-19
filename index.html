@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Typer - Test Your Typing Skills</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 400;
+            color: #7f8c8d;
+        }
+
+        .timer {
+            position: relative;
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .quote-display {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            min-height: 150px;
+            font-size: 20px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .quote-input {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            resize: none;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .quote-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .correct {
+            color: #27ae60;
+        }
+
+        .incorrect {
+            color: #e74c3c;
+            text-decoration: underline;
+        }
+
+        .current {
+            background-color: #f1c40f;
+            border-radius: 3px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:focus {
+            outline: none;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .results h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 120px;
+            margin: 5px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-box h4 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .difficulty-select {
+            margin-right: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .quote-display, .quote-input {
+                font-size: 16px;
+            }
+
+            .stat-box {
+                min-width: 100px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speed Typer</h1>
+        <h2>Test Your Typing Skills</h2>
+
+        <div class="timer" id="timer">00:00</div>
+
+        <div class="quote-display" id="quoteDisplay"></div>
+        <textarea id="quoteInput" class="quote-input" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
+        <div class="controls">
+            <select id="difficultySelect" class="difficulty-select">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button id="startBtn" class="btn">Start Test</button>
+        </div>
+
+        <div class="results" id="results">
+            <h3>Your Results</h3>
+            <div class="stats">
+                <div class="stat-box">
+                    <h4>WPM</h4>
+                    <p id="wpm">0</p>
+                </div>
+                <div class="stat-box">
+                    <h4>CPM</h4>
+                    <p id="cpm">0</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Accuracy</h4>
+                    <p id="accuracy">0%</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Time</h4>
+                    <p id="time">0s</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const quoteDisplayElement = document.getElementById('quoteDisplay');
+        const quoteInputElement = document.getElementById('quoteInput');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('startBtn');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const resultsElement = document.getElementById('results');
+        const wpmElement = document.getElementById('wpm');
+        const cpmElement = document.getElementById('cpm');
+        const accuracyElement = document.getElementById('accuracy');
+        const timeElement = document.getElementById('time');
+
+        // Quotes by difficulty
+        const quotes = {
+            easy: [
+                "The quick brown fox jumps over the lazy dog.",
+                "All that glitters is not gold.",
+                "Practice makes perfect.",
+                "Actions speak louder than words.",
+                "A journey of a thousand miles begins with a single step."
+            ],
+            medium: [
+                "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+                "The future belongs to those who believe in the beauty of their dreams.",
+                "The only limit to our realization of tomorrow will be our doubts of today.",
+                "Life is what happens when you're busy making other plans.",
+                "You miss 100% of the shots you don't take."
+            ],
+            hard: [
+                "I am not a product of my circumstances. I am a product of my decisions. I alone cannot change the world, but I can cast a stone across the waters to create many ripples.",
+                "The greatest glory in living lies not in never falling, but in rising every time we fall. The way to get started is to quit talking and begin doing. Your time is limited, so don't waste it living someone else's life.",
+                "If you look at what you have in life, you'll always have more. If you look at what you don't have in life, you'll never have enough. Spread love everywhere you go. Let no one ever come to you without leaving happier.",
+                "Many of life's failures are people who did not realize how close they were to success when they gave up. The future belongs to those who believe in the beauty of their dreams. It does not matter how slowly you go as long as you do not stop.",
+                "In the end, it's not the years in your life that count. It's the life in your years. Life is either a daring adventure or nothing at all. You have within you right now, everything you need to deal with whatever the world can throw at you."
+            ]
+        };
+
+        let currentQuote = '';
+        let startTime;
+        let timer;
+        let isTestRunning = false;
+        let totalTypedChars = 0;
+        let correctTypedChars = 0;
+
+        // Initialize the app
+        function init() {
+            // Event listeners
+            startButton.addEventListener('click', startTest);
+            quoteInputElement.addEventListener('input', processInput);
+            
+            // Prepare initial state
+            quoteInputElement.disabled = true;
+            renderNewQuote();
+        }
+
+        // Start the typing test
+        function startTest() {
+            if (isTestRunning) return;
+            
+            isTestRunning = true;
+            startButton.textContent = 'Restart Test';
+            resultsElement.style.display = 'none';
+            
+            // Reset state
+            quoteInputElement.value = '';
+            quoteInputElement.disabled = false;
+            renderNewQuote();
+            totalTypedChars = 0;
+            correctTypedChars = 0;
+            
+            // Focus on input
+            quoteInputElement.focus();
+            
+            // Start timer
+            startTime = new Date();
+            timerElement.textContent = '00:00';
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        // Update the timer display
+        function updateTimer() {
+            const currentTime = new Date();
+            const timeElapsed = Math.floor((currentTime - startTime) / 1000);
+            
+            const minutes = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
+            const seconds = (timeElapsed % 60).toString().padStart(2, '0');
+            
+            timerElement.textContent = `${minutes}:${seconds}`;
+        }
+
+        // End the typing test
+        function endTest() {
+            isTestRunning = false;
+            clearInterval(timer);
+            quoteInputElement.disabled = true;
+            
+            // Calculate results
+            const timeElapsed = Math.floor((new Date() - startTime) / 1000);
+            const minutes = timeElapsed / 60;
+            
+            // Words per minute (WPM) - assuming average word is 5 characters
+            const wpm = Math.round((totalTypedChars / 5) / minutes);
+            
+            // Characters per minute (CPM)
+            const cpm = Math.round(totalTypedChars / minutes);
+            
+            // Accuracy
+            const accuracy = Math.round((correctTypedChars / totalTypedChars) * 100) || 0;
+            
+            // Display results
+            wpmElement.textContent = wpm;
+            cpmElement.textContent = cpm;
+            accuracyElement.textContent = `${accuracy}%`;
+            timeElement.textContent = `${timeElapsed}s`;
+            resultsElement.style.display = 'block';
+        }
+
+        // Get a random quote based on difficulty
+        function getRandomQuote() {
+            const difficulty = difficultySelect.value;
+            const quoteArray = quotes[difficulty];
+            return quoteArray[Math.floor(Math.random() * quoteArray.length)];
+        }
+
+        // Render a new quote
+        function renderNewQuote() {
+            currentQuote = getRandomQuote();
+            quoteDisplayElement.innerHTML = '';
+            
+            // Create a span for each character in the quote
+            currentQuote.split('').forEach(char => {
+                const charSpan = document.createElement('span');
+                charSpan.innerText = char;
+                quoteDisplayElement.appendChild(charSpan);
+            });
+        }
+
+        // Process input as user types
+        function processInput() {
+            if (!isTestRunning) return;
+            
+            const arrayQuote = quoteDisplayElement.querySelectorAll('span');
+            const arrayValue = quoteInputElement.value.split('');
+            
+            let correct = true;
+            let currentCharIndex = 0;
+            
+            // Check each character
+            arrayQuote.forEach((charSpan, index) => {
+                const character = arrayValue[index];
+                
+                // Remove all classes first
+                charSpan.classList.remove('correct', 'incorrect', 'current');
+                
+                // If character exists in input
+                if (character != null) {
+                    totalTypedChars++;
+                    
+                    // Check if character is correct
+                    if (character === charSpan.innerText) {
+                        charSpan.classList.add('correct');
+                        correctTypedChars++;
+                    } else {
+                        charSpan.classList.add('incorrect');
+                        correct = false;
+                    }
+                } else {
+                    // Mark the current character
+                    if (index === arrayValue.length) {
+                        charSpan.classList.add('current');
+                        currentCharIndex = index;
+                    }
+                }
+            });
+            
+            // Highlight the next character to type
+            if (currentCharIndex < arrayQuote.length) {
+                arrayQuote[currentCharIndex].classList.add('current');
+            }
+            
+            // End test if quote is completed
+            if (arrayValue.length === arrayQuote.length) {
+                endTest();
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
